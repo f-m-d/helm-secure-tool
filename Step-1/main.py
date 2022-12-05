@@ -3,7 +3,7 @@ import pprint
 import yaml
 
 
-
+####################################
 def GetTemplateType(path):
   # Open the file
   yaml_file = open(r'C:\Users\King Crimson\Desktop\Test_HelmChart\demo\templates\service.yaml')
@@ -17,7 +17,7 @@ def GetTemplateType(path):
       print("Line{}: {}".format(count, line.strip()))
     count += 1
 
-
+######################################
 def GetHelmLines(path):
   # Open the file
   yaml_file = open(r'C:\Users\King Crimson\Desktop\Test_HelmChart\demo\templates\service.yaml')
@@ -32,6 +32,15 @@ def GetHelmLines(path):
     count += 1
 
 
+#####################################
+def ReplaceHelmLines(path):
+  # Open the file
+  yaml_file = open(r'C:\Users\King Crimson\Desktop\Test_HelmChart\demo\templates\service.yaml')
+  lines = yaml_file.readlines()
+
+
+
+############ MAIN #######################
 
 if __name__ == "__main__":
   GetTemplateType("a")
