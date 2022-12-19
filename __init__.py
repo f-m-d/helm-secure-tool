@@ -1,6 +1,7 @@
 import json
 import pprint
 import yaml
+import re
 from os import listdir
 from os.path import isfile, isdir, join
 from graph import Graph
@@ -37,8 +38,9 @@ def FolderCheck(path, graph_handler):
   # Print only
   for file in onlyfiles:
     if file.find(".yaml") != -1 or file.find(".yml") != -1:
-      #print("FILE PATH: " + path + "\\" + file)
+      print("FILE PATH: " + path + "\\" + file)
       helm_type_list = GetTemplateType(path+"\\"+file)
+      CheckDefaultHelmObjects(path+"\\"+file, helm_type_list)
       print("####################################")
       # Add edge to the graph
       for helm_type in helm_type_list:
@@ -72,8 +74,6 @@ def GetTemplateType(path):
             #Add the string to return
             a = line.strip().split()
             helm_type = a[1]
-            print("---- HELM TYPE PRINT ----")
-            print(helm_type)
             helm_type_list.append(helm_type)
         count += 1
     return helm_type_list
@@ -94,7 +94,7 @@ def GetHelmLines(path):
 
 
 #####################################
-def CheckDefaultHelmObjects(path):
+def CheckDefaultHelmObjects(path, type_list):
 # Open the file
     yaml_file = open(path)
     lines = yaml_file.readlines()
@@ -115,8 +115,9 @@ if __name__ == "__main__":
   #path = r"C:\Users\King Crimson\Desktop\Test_HelmChart\demo\templates\configmap.yaml"
   #GetTemplateType(path)
   #GetHelmLines(path)
+  path = r"C:\Users\King Crimson\Desktop\Test_HelmChart\test-chart\templates"
   graph_handler = Graph(0)
-  FolderCheck(r"C:\Users\King Crimson\Desktop\Test_HelmChart\test-chart\templates", graph_handler)
+  FolderCheck(path, graph_handler)
 
   #Instantiate an empty graph
 
@@ -124,4 +125,32 @@ if __name__ == "__main__":
   # Add nodes to list
   graph_handler.print_edge_list()
 
+  yaml_file = open(path+"\\service.yaml")
+  lines = yaml_file.readlines()
+
+  count=0
+  for line in lines:
+
+  # Regex: https://regex101.com/ 
+  # {{.*}}
+
+      # Check for Helm Strings: starting with "{{" and ending with "}}"
+      if line.find("{{") != -1:
+          print("Line{}: {}".format(count, line.strip()))
+          new_line = re.sub(r'{{.*}}', "\"XXXXXXXXXX\"", line)
+          lines[lines.index(line)] = new_line
+          print("NEW LINES{}: {}".format(count, line.strip()))
+      count += 1
+
+  new_count = 0
+  for line in lines:
+    pprint.pprint(line)
+    new_count +=1
   pass
+
+  print("Lines type")
+  print(type(lines))
+
+  # Change it to a dictionary somehow!!
+
+
