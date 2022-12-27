@@ -138,18 +138,20 @@ if __name__ == "__main__":
       if line.find("{{") != -1:
           print("Line{}: {}".format(count, line.strip()))
           new_line = re.sub(r'{{.*}}', "\"XXXXXXXXXX\"", line)
+          new_line = re.sub(r'.\n',"",new_line)
           lines[lines.index(line)] = new_line
           print("NEW LINES{}: {}".format(count, line.strip()))
       count += 1
 
   new_count = 0
   for line in lines:
-    pprint.pprint(line)
+    print(line)
     new_count +=1
   pass
 
   print("Lines type")
   print(type(lines))
+
 
   # Change it to a dictionary somehow!!
 
