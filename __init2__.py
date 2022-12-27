@@ -47,7 +47,7 @@ if __name__ == "__main__":
       path = argv[1]
       graph_handler = Graph(0)
 
-      # Step1: return all files yaml from a path
+      # Step1: return all files YAML from the Helm Chart main dir (recursively)
       file_array = Step1_ReturnHelmTemplatesList(path)
       #print(file_array)
 
