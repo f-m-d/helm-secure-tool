@@ -48,16 +48,26 @@ if __name__ == "__main__":
       graph_handler = Graph(0)
 
       # Step1: return all files YAML from the Helm Chart main dir (recursively)
-      file_array = Step1_ReturnHelmTemplatesList(path)
-      #print(file_array)
+      path_file_list = Step1_ReturnHelmTemplatesList(path)
+      #print(path_file_list)
 
       # Get Helm Kinds
       helm_kind_list = []
-      for path in file_array:
+      for path in path_file_list:
         helm_kind_list.append(HelmHandler.GetHelmTemplateKind(path))
       
-      HelmHandler.PrintPathAndKinds(file_array, helm_kind_list)
+      HelmHandler.PrintPathAndKinds(path_file_list, helm_kind_list)
 
-      #print(*helm_kind_list, sep = ", ")
+      # Adding POD to graph
+      for path, helm_kind in zip(path_file_list, helm_kind_list):
+        if "HorizontalPodAutoscaler" in helm_kind and "Deployment" in helm_kind:
+          print("### GOT HPA: " + path + " ###")
 
-      pass
+        if "Pod" in helm_kind:
+          pod_name, container_name = HelmHandler.GetPodAndContainerName(path)
+          graph_handler.add_edge("Namespace::Test_Namespace", pod_name, 1)
+          graph_handler.add_edge(pod_name, container_name, 1)
+        
+
+
+      graph_handler.print_edge_list()
