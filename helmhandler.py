@@ -1,5 +1,7 @@
 from fileinput import close
+from graph import Graph
 import itertools as IT
+import re
 
 
 class HelmHandler:
@@ -41,5 +43,28 @@ class HelmHandler:
     ## FROM FILE WITH KIND "Pod", ADD IT TO GRAPTH WITH FORMAT
     ## FOR THE POD: Add_To_Graph("Pod::[POD-NAME]", "Container::[CONTAINER-NAME]::[Image:1.0.0]",1)
     ## FOR THE NAMESPACE: Add_To_Graph("Namespace", "Pod::[POD-NAME]", 1)
-    def AddPodToGraph(path):
-        pass
+    def GetPodAndContainerName(path):
+
+      pod_name = "Pod::"
+      container_name = "Container::"
+
+      # Read the file
+      yaml_file = open(path)
+      lines = yaml_file.readlines()
+      yaml_file.close()
+
+      for line in lines:
+        if "  name: " in line:
+          # Strip the POD name
+          #print("### POD NAME ###")
+          #print(line)
+          #print("File path: "+path)
+          pod_name = pod_name + re.sub("  name: ", "", line)
+        
+          
+        if "    - name: " in line:
+          # Strip the Container name
+          #print("### CONTAINER NAME ###")
+          #print(line)
+          container_name = container_name + re.sub("    - name: ", "", line)
+      return pod_name, container_name
