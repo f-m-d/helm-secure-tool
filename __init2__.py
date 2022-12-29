@@ -60,8 +60,11 @@ if __name__ == "__main__":
 
       # Adding POD to graph
       for path, helm_kind in zip(path_file_list, helm_kind_list):
-        if "HorizontalPodAutoscaler" in helm_kind and "Deployment" in helm_kind:
-          print("### GOT HPA: " + path + " ###")
+        if "Deployment" in helm_kind:
+          deployment_name, pod_name = HelmHandler.GetDeploymentAndPodName(path)
+          graph_handler.add_edge("Namespace::Test_Namespace", deployment_name, 1)
+          graph_handler.add_edge("Namespace::Test_Namespace", pod_name, 1)
+          graph_handler.add_edge(deployment_name, pod_name, 1)
 
         if "Pod" in helm_kind:
           pod_name, container_name = HelmHandler.GetPodAndContainerName(path)

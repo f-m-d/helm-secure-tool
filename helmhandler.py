@@ -68,3 +68,38 @@ class HelmHandler:
           #print(line)
           container_name = container_name + re.sub("    - name: ", "", line)
       return pod_name, container_name
+
+
+
+
+  
+
+    # FROM FILE WITH KIND "Deployment", ADD IT TO GRAPH WITH FORMAT
+    # FOR THE DEPLOYMENT AND POD: Add_To_Graph("Deployment::[DP-NAME]", "Pod::[POD-NAME or label]",1)
+    # FOR THE NAMESPACE: Add_To_Graph("Namespace", "Deployment::[DP-NAME]", 1)
+    def GetDeploymentAndPodName(path):
+      pod_name = "Pod::"
+      deployment_name = "Deployment::"
+
+      # Read the file
+      yaml_file = open(path)
+      lines = yaml_file.readlines()
+      yaml_file.close()
+
+      for line in lines:
+        if "  name: " in line:
+          # Strip the POD name
+          #print("### POD NAME ###")
+          #print(line)
+          #print("File path: "+path)
+          deployment_name = deployment_name + re.sub("  name: ", "", line)
+          pod_name = pod_name + re.sub("  name: ", "", line)
+      return deployment_name, pod_name
+    
+
+    ## FROM FILE WITH KIND "Service", ADD IT TO GRAPTH WITH FORMAT
+    ## FOR THE SERVICE AND POD: Add_To_Graph("Service::[SVC-NAME]", "Pod::[POD-NAME or label]",1)
+    ## FOR THE NAMESPACE: Add_To_Graph("Namespace", "Service::[SVC-NAME]", 1)
+    def GetServiceAndPodName(path):
+      pass
+
