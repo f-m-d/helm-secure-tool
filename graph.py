@@ -15,7 +15,7 @@ class Graph:
         # If a graph is undirected, add the same edge,
         # but also in the opposite direction
         if not self.m_directed:
-            self.m_list_of_edges.append([node1, node2, weight])
+            self.m_list_of_edges.append([node2, node1, weight])
 
 	# Print a graph representation
     def print_edge_list(self):

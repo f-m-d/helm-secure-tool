@@ -100,6 +100,23 @@ class HelmHandler:
     ## FROM FILE WITH KIND "Service", ADD IT TO GRAPTH WITH FORMAT
     ## FOR THE SERVICE AND POD: Add_To_Graph("Service::[SVC-NAME]", "Pod::[POD-NAME or label]",1)
     ## FOR THE NAMESPACE: Add_To_Graph("Namespace", "Service::[SVC-NAME]", 1)
-    def GetServiceAndPodName(path):
-      pass
+    ## NB: THE PODS ARE GENERETED BY DEPLOYMENT/REPLICASETS/DAEMONSETS ETC.
+    ## SO THE SERVICES 
+    def GetServiceAndPodLabels(path):
+      service_name = "Service::"
+      pod_label = "Pod::Label::"
+
+      yaml_file = open(path)
+      lines = yaml_file.readlines()
+      yaml_file.close()    
+
+
+      for line in lines:
+        if "  name: " in line:
+          # Strip service Name
+          service_name = service_name + re.sub("  name: ", "", line)
+        if "  selector: ":
+          pod_label = pod_label + re.sub("  selector: ", "", line)
+      
+      return service_name, pod_label
 

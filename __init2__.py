@@ -71,6 +71,9 @@ if __name__ == "__main__":
           graph_handler.add_edge("Namespace::Test_Namespace", pod_name, 1)
           graph_handler.add_edge(pod_name, container_name, 1)
         
-
+        if "Service" in helm_kind:
+          service_name, pod_label = HelmHandler.GetServiceAndPodLabels(path)
+          graph_handler.add_edge("Namespace::Test_Namespace", service_name,1)
+          graph_handler.add_edge(service_name,pod_label,1)
 
       graph_handler.print_edge_list()
