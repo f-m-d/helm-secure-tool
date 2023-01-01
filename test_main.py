@@ -15,5 +15,15 @@ if __name__ == "__main__":
   print("--- FILE PATH ---")
   print(helm_template_output_file)
 
-  Helm.GetHelmTemplateListFromFile(helm_template_output_file)
+  template_list = Helm.GetHelmTemplateListFromFile(helm_template_output_file)
+  #print("### PRINTING FILE LIST")
+  #print(template_list)
+
+  for template in template_list:
+    print("#########################################")
+    print("############# PRINTING FILE #############")
+    print("#########################################")
+    for line in template:
+      print(line)
+
   
