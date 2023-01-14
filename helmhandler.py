@@ -140,3 +140,42 @@ class HelmHandler:
 
       return service_name, pod_label_list
 
+
+    ## FROM FILE WITH KIND "PersistentVolume", ADD IT TO GRAPTH WITH FORMAT
+    ## FOR THE NAMESPACE: Add_To_Graph("Namespace", "Volume::[PV-NAME]", 1)
+    def GetPersistentVolumeName(template):
+      volume_name_found = False
+      volume_name = "Volume::"
+
+      for line in template:
+        if "  name: " in line and not volume_name_found:
+          volume_name = volume_name + re.sub("  name: ", "", line)
+          volume_name_found = True
+
+      return volume_name
+
+
+    ## FROM FILE WITH KIND "PersistentVolumeClain", ADD IT TO GRAPTH WITH FORMAT
+    ## FOR THE VOLUME: Add_To_Graph("PersistentVolumeClaim::[PVC-NAME], "Volume::[PV-NAME]"")
+    ## FOR THE NAMESPACE: Add_To_Graph("Namespace", "PersistentVolumeClaim::[PVC-NAME]", 1)
+    ## FOR THE NAMESPACE: Add_To_Graph("Namespace", "Volume::[PV-NAME]", 1)
+    def GetPersistentVolumeClaimAndVolumeName(template):
+      persistent_volume_claim_name_found = False
+      volume_name_found = False
+      persistent_volume_claim_name = "PersistentVolumeClaim::"
+      volume_name = "Volume::"
+
+      for line in template:
+        if "  name: " in line and not persistent_volume_claim_name_found:
+          persistent_volume_claim_name = persistent_volume_claim_name + re.sub("  name: ", "", line)
+          volume_name_found = True
+
+        if "  claimRef:" in line and not volume_name_found:
+          volume_name_found = True
+        
+
+        if "    name:" in line and volume_name_found:
+          volume_name = volume_name + re.sub("  name: ", "", line)
+
+      return persistent_volume_claim_name, volume_name
+
