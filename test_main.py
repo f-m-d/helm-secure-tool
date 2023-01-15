@@ -48,7 +48,7 @@ if __name__ == "__main__":
         graph_handler.add_edge(namespace, container_name, 1)
         graph_handler.add_edge(pod_name, container_name, 1)
         
-    if "kind: Service" in template:
+    if "kind: Service" and not "kind: ServiceAccount" and not "kind: ServiceMonitor" in template:
       service_name, pod_label_list = HelmHandler.GetServiceAndPodLabels(template)
       graph_handler.add_edge(namespace, service_name,1)
 
@@ -65,6 +65,18 @@ if __name__ == "__main__":
       graph_handler.add_edge(namespace, pvc_name,1)
       graph_handler.add_edge(namespace, volume_name,1)
       graph_handler.add_edge(pvc_name, volume_name,1)
+
+    if "kind: RoleBinding" in template:
+      rb_name, r_name, users = HelmHandler.GetRoleBindingNameRoleNameAndUsers(template)
+      graph_handler.add_edge(namespace, rb_name)
+      graph_handler.add_edge(namespace, r_name)
+      for user in users:
+        graph_handler.add_edge(rb_name, user,1)
+
+    if "kind: ClusterRoleBinding" in template:
+      pass
+
+
  
   # Print Edge
   print("#########################################")

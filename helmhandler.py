@@ -179,3 +179,53 @@ class HelmHandler:
 
       return persistent_volume_claim_name, volume_name
 
+
+    def GetRoleBindingNameRoleNameAndUsers(template):
+      rolebinding_name = "RoleBinding::"
+      role_name = "Role::"
+      kinds = []
+      users = []
+      return_list = []
+      rolebinding_found = False
+      role_found = False
+      users_found = False
+
+      for line in template:
+        if "  name:" in line and not rolebinding_found:
+          rolebinding_found = True
+          rolebinding_stub = rolebinding_name + re.sub("  name: ", "", line)
+
+
+        if "subjects:" in line and not users_found:
+          users_found = True
+
+        if "kind:" in line and users_found:
+          kind_stub = re.sub("kind:", "", line)
+          kinds.append(kind_stub)
+
+        
+        if "  name:" in line and users_found:
+          user_name_stub = re.sub("name:", "", line)
+          users.append(user_name_stub)
+          pass   
+
+
+        if "roleRef:" in line and not role_found:
+          role_found = True
+        
+        if "  name:" in line and role_found:
+          role_name_stub = role_name + re.sub("  name: ", "", line)
+
+        
+
+      for kind, user in zip(kinds, users):
+        element_stub = kind + "::"+user
+        return_list.append(element_stub)
+
+      return rolebinding_stub, role_name_stub, return_list
+
+
+    def GetClusterRoleBindingAndClusterRoleName():
+      pass
+
+
