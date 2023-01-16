@@ -67,14 +67,19 @@ if __name__ == "__main__":
       graph_handler.add_edge(pvc_name, volume_name,1)
 
     if "kind: RoleBinding" in template:
-      rb_name, r_name, users = HelmHandler.GetRoleBindingNameRoleNameAndUsers(template)
+      rb_name, r_name, users = HelmHandler.GetRoleBindingNameRoleNameAndUsers(template, "kind: RoleBinding")
       graph_handler.add_edge(namespace, rb_name)
       graph_handler.add_edge(namespace, r_name)
       for user in users:
         graph_handler.add_edge(rb_name, user,1)
 
     if "kind: ClusterRoleBinding" in template:
-      pass
+      rb_name, r_name, users = HelmHandler.GetRoleBindingNameRoleNameAndUsers(template, "kind: ClusterRoleBinding")
+      graph_handler.add_edge(namespace, rb_name)
+      graph_handler.add_edge(namespace, r_name)
+      for user in users:
+        graph_handler.add_edge(rb_name, user,1)
+
 
 
  
