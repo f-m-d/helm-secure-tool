@@ -83,6 +83,7 @@ class HelmHandler:
     def GetDeploymentAndPodName(template):
       pod_name_found = False
       deployment_name_found = False
+      volume_mounts_found = False
       pod_name = "Pod::"
       deployment_name = "Deployment::"
 
@@ -100,6 +101,19 @@ class HelmHandler:
           deployment_name = deployment_name + re.sub("  name: ", "", line)
           pod_name = pod_name + re.sub("  name: ", "", line)
           deployment_name_found = True
+
+        if "volumeMounts:" in line:
+          volume_mounts_found = True
+        
+
+        if "- name:" in line and volume_mounts_found:
+          mount_name = "VolumeMount::" + re.sub("- name:", "", line)
+          print(mount_name)
+
+        # Check the end of the volumeMounts tag:
+        if ("            - name:" not in line or "mountPath:" not in line or "subPath:" not in line) and volume_mounts_found:
+          volume_mounts_found = False
+
 
       return deployment_name, pod_name
     

@@ -2,6 +2,7 @@ from test import Helm
 from sys import argv
 from graph import Graph
 from helmhandler import HelmHandler
+from yamlparser import YamlParser
 
 if __name__ == "__main__":
 
@@ -39,6 +40,9 @@ if __name__ == "__main__":
       graph_handler.add_edge(namespace, deployment_name, 1)
       graph_handler.add_edge(namespace, pod_name, 1)
       graph_handler.add_edge(deployment_name, pod_name, 1)
+
+      # Experimental
+      YamlParser.GetDeployments(template,path)
     
     if "kind: Pod" in template:
       pod_name, container_list = HelmHandler.GetPodAndContainerName(template)
