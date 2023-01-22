@@ -3,39 +3,109 @@ import re
 
 class YamlParser:
 
+    def CreateTemplateYamlFile(template, path):
+      # Stub file name
+      STUB_YAML_FILE_NAME = "stub_yaml_file.yaml"
 
-
-    def GetDeployments(template, path):
-
-      first_line = True
-        # Write on a test file
+      # Remove first line (Comment by Helm)
       template.pop(0)
-      with open(path + "\\"+ "file_appoggio.yaml", "w") as f:
+
+      # Create stub file
+      yaml_file_name = path + "\\"+ STUB_YAML_FILE_NAME
+
+      # Write YAML Helm Template in YAML stub file
+      with open(yaml_file_name, "w") as f:
         for line in template:
+          # Remove "{ }" chars
           line = line.replace("{", "\"")
           line = line.replace("}", "\"")
           f.write(line + "\n")
         f.close
+      return yaml_file_name
 
 
-      with open(path + "\\"+ "file_appoggio.yaml", 'r+') as stream:
+    def GetDeploymentAndContainers(template, path):
+      deployment_name = "Deployment::"
+      container_name = "Container::"
+      container_list = []
+
+      # Write on a test file
+      yaml_stub_path = YamlParser.CreateTemplateYamlFile(template,path)
+
+      # Open test file
+      with open(yaml_stub_path, 'r+') as stream:
         try:
-          
           parsed_yaml=yaml.safe_load(stream)
-          print(parsed_yaml)
-          print("### KIND PRINT ####")
-          print(parsed_yaml["kind"])
-          print("### LABELS ####")
-          print(parsed_yaml["spec"]["template"]["metadata"]["labels"])
-          print("### CONTAINERS ###")
-          print(parsed_yaml["spec"]["template"]["spec"]["containers"])
+          #print(parsed_yaml)
 
+          # Get Deployment name
+          deployment_name = deployment_name + parsed_yaml["metadata"]["name"]
+
+          # Get container names
           for element in parsed_yaml["spec"]["template"]["spec"]["containers"]:
-            print("### NAME ###")
-            print(element["name"])
+            container_list.append(container_name + "" + element["name"])
+          
+          return deployment_name, container_list
 
         except yaml.YAMLError as exc:
           print(exc)
+
+    
+
+    def GetPodAndContainers(template, path):
+      pod_name = "Pod::"
+      container_name = "Container::"
+      container_list = []
+
+      # Write on a test file
+      yaml_stub_path = YamlParser.CreateTemplateYamlFile(template,path)
+
+      # Open test file
+      with open(yaml_stub_path, 'r+') as stream:
+        try:
+          parsed_yaml=yaml.safe_load(stream)
+
+          # Get Deployment name
+          pod_name = pod_name + parsed_yaml["metadata"]["name"]
+
+          # Get container names
+          for element in parsed_yaml["spec"]["containers"]:
+            container_list.append(container_name + "" + element["name"])
+          
+          return pod_name, container_list
+
+        except yaml.YAMLError as exc:
+          print(exc)
+
+
+
+    def GetServiceAndPodLabels(template, path):
+      svc_name = "Service::"
+      pod_label = "Pod::Label::"
+      pod_label_list = []
+
+      # Write on a test file
+      yaml_stub_path = YamlParser.CreateTemplateYamlFile(template,path)
+
+      # Open test file
+      with open(yaml_stub_path, 'r+') as stream:
+        try:
+          parsed_yaml=yaml.safe_load(stream)
+
+          # Get Deployment name
+          svc_name = svc_name + parsed_yaml["metadata"]["name"]
+
+          # Get container names
+          for element in parsed_yaml["spec"]["selector"]:
+            print(element)
+            #pod_label_list.append(pod_label + "" + element["name"])
+          
+          return svc_name, pod_label_list
+
+        except yaml.YAMLError as exc:
+          print(exc)
+        
+
 
 
 
