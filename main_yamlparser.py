@@ -68,16 +68,15 @@ if __name__ == "__main__":
         graph_handler.add_edge(pod_name, container, 1)
         
     if kind == "kind: Service":
-        print("### SERVICE FOUND! ###")
-    #   service_name, pod_label_list = HelmHandler.GetServiceAndPodLabels(template)
-    #   graph_handler.add_edge(namespace, service_name,1)
+      svc_name, pod_label_list = YamlParser.GetServiceAndPodLabels(template, path)
+      graph_handler.add_edge(namespace, svc_name,1)
+      for pod_label in pod_label_list:
+        graph_handler.add_edge(svc_name, pod_label, 1)
 
-    #   for pod_label in pod_label_list:
-    #     graph_handler.add_edge(service_name,pod_label,1)
 
-    # if "kind: PersistentVolume" in template:
-    #   volume_name = HelmHandler.GetPersistentVolumeName(template)
-    #   graph_handler.add_edge(namespace, volume_name,1)
+    if kind == "kind: PersistentVolume":
+      pv_name = YamlParser.GetPersistentVolumeName(template, path)
+      graph_handler.add_edge(namespace, pv_name, 1)
 
     
     # if "kind: PersistentVolumeClaim" in template:
