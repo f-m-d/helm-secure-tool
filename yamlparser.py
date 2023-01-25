@@ -115,7 +115,6 @@ class YamlParser:
     def GetPersistentVolumeName(template, path):
       pv_name = "PersistentVolume::"
 
-
       # Write on a test file
       yaml_stub_path = YamlParser.CreateTemplateYamlFile(template,path)
 
@@ -131,6 +130,91 @@ class YamlParser:
 
         except yaml.YAMLError as exc:
           print(exc)
+
+
+
+    
+    def GetPvcNameAndPvName(template, path):
+      pvc_name = "PersistentVolumeClaim::"
+      pv_name = "PersistentVolume::"
+
+
+      # Write on a test file
+      yaml_stub_path = YamlParser.CreateTemplateYamlFile(template,path)
+
+      # Open test file
+      with open(yaml_stub_path, 'r+') as stream:
+        try:
+          parsed_yaml=yaml.safe_load(stream)
+
+          # Get PVC and PV name
+          pvc_name = pvc_name + parsed_yaml["metadata"]["name"]
+          pv_name = pv_name + parsed_yaml["metadata"]["volumeName"]
+      
+          
+          return pvc_name, pv_name
+
+        except yaml.YAMLError as exc:
+          print(exc)
+
+
+    # 1) Resoure RoleBinding to namespace
+    # 2) Add_To_Graph(Role, User::Name,1)
+    def GetRoleBindingNameRoleNameAndUsers(template, path):
+      rb_name = "RoleBinding::"
+      role_name = "Role::"
+      users = []
+
+      # Write on a test file
+      yaml_stub_path = YamlParser.CreateTemplateYamlFile(template,path)
+
+      # Open test file
+      with open(yaml_stub_path, 'r+') as stream:
+        try:
+          parsed_yaml=yaml.safe_load(stream)
+
+          # Get RoleBinding, Role and Users
+          rb_name = rb_name + parsed_yaml["metadata"]["name"]
+          role_name = role_name + parsed_yaml["roleRef"]["name"]
+          
+          for item in parsed_yaml["subjects"]:
+            users.append(item["kind"] + "::" + item["name"])
+      
+          return rb_name, role_name, users
+
+        except yaml.YAMLError as exc:
+          print(exc)
+
+      pass
+
+
+
+    def GetClusterRoleBindingNameClusterRoleNameAndUsers(template, path):
+      rb_name = "ClusterRoleBinding::"
+      role_name = "ClusterRole::"
+      users = []
+
+      # Write on a test file
+      yaml_stub_path = YamlParser.CreateTemplateYamlFile(template,path)
+
+      # Open test file
+      with open(yaml_stub_path, 'r+') as stream:
+        try:
+          parsed_yaml=yaml.safe_load(stream)
+
+          # Get RoleBinding, Role and Users
+          rb_name = rb_name + parsed_yaml["metadata"]["name"]
+          role_name = role_name + parsed_yaml["roleRef"]["name"]
+          
+          for item in parsed_yaml["subjects"]:
+            users.append(item["kind"] + "::" + item["name"])
+      
+          return rb_name, role_name, users
+
+        except yaml.YAMLError as exc:
+          print(exc)
+
+      pass
         
 
 

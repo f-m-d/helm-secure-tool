@@ -46,14 +46,14 @@ if __name__ == "__main__":
         if m.__class__.__name__ == "Match":
           #print(m.group())
           kind = m.group()
-          print(kind)
+          #print(kind)
           break
 
     
     #if "kind: Deployment" in template:
     if kind == "kind: Deployment":
-
       deployment_name, containers = YamlParser.GetDeploymentAndContainers(template, path)
+      print("### DEPLOYMENT ###")
       graph_handler.add_edge(namespace, deployment_name, 1)
       for container in containers:
         graph_handler.add_edge(namespace, container, 1)
@@ -62,6 +62,7 @@ if __name__ == "__main__":
     
     if kind == "kind: Pod":
       pod_name, containers = YamlParser.GetPodAndContainers(template, path)
+      print("### POD ###")
       graph_handler.add_edge(namespace, pod_name, 1)
       for container in containers:
         graph_handler.add_edge(namespace, container, 1)
@@ -69,6 +70,7 @@ if __name__ == "__main__":
         
     if kind == "kind: Service":
       svc_name, pod_label_list = YamlParser.GetServiceAndPodLabels(template, path)
+      print("### SERVICE ###")
       graph_handler.add_edge(namespace, svc_name,1)
       for pod_label in pod_label_list:
         graph_handler.add_edge(svc_name, pod_label, 1)
@@ -76,28 +78,32 @@ if __name__ == "__main__":
 
     if kind == "kind: PersistentVolume":
       pv_name = YamlParser.GetPersistentVolumeName(template, path)
+      print("### PERSISTENT VOLUME ####")
       graph_handler.add_edge(namespace, pv_name, 1)
 
     
-    # if "kind: PersistentVolumeClaim" in template:
-    #   pvc_name, volume_name = HelmHandler.GetPersistentVolumeClaimAndVolumeName(template)
-    #   graph_handler.add_edge(namespace, pvc_name,1)
-    #   graph_handler.add_edge(namespace, volume_name,1)
-    #   graph_handler.add_edge(pvc_name, volume_name,1)
+    if kind == "kind: PersistentVolumeClaim":
+      pvc_name, pv_name = YamlParser.GetPvcNameAndPvName(template,path)
+      print("### PERSISTENT VOLUME CLAIM ###")
+      graph_handler.add_edge(namespace, pvc_name,1)
+      graph_handler.add_edge(pvc_name, pv_name, 1)
 
-    # if "kind: RoleBinding" in template:
-    #   rb_name, r_name, users = HelmHandler.GetRoleBindingNameRoleNameAndUsers(template, "kind: RoleBinding")
-    #   graph_handler.add_edge(namespace, rb_name)
-    #   graph_handler.add_edge(namespace, r_name)
-    #   for user in users:
-    #     graph_handler.add_edge(rb_name, user,1)
+
+    if kind == "kind: RoleBinding":
+      rb_name, role_name, users = YamlParser.GetRoleBindingNameRoleNameAndUsers(template,path)
+      print("### ROLE BINDING, ROLE AND USERS ###")
+      graph_handler.add_edge(namespace, rb_name,1)
+      for user in users:
+        graph_handler.add_edge(role_name, user,1)
+
 
     # if "kind: ClusterRoleBinding" in template:
-    #   rb_name, r_name, users = HelmHandler.GetRoleBindingNameRoleNameAndUsers(template, "kind: ClusterRoleBinding")
-    #   graph_handler.add_edge(namespace, rb_name)
-    #   graph_handler.add_edge(namespace, r_name)
-    #   for user in users:
-    #     graph_handler.add_edge(rb_name, user,1)
+    if kind == "kind: ClusterRoleBinding":
+      crb_name, crole_name, users = YamlParser.GetClusterRoleBindingNameClusterRoleNameAndUsers(template,path)
+      print("### CLUSTER ROLE BINDING, CLUSTER ROLE AND USERS ###")
+      graph_handler.add_edge(namespace, crb_name,1)
+      for user in users:
+        graph_handler.add_edge(crole_name, user,1)
 
 
 
