@@ -105,6 +105,11 @@ if __name__ == "__main__":
       for user in users:
         graph_handler.add_edge(crole_name, user,1)
 
+    if kind == "kind: PodSecurityPolicy":
+      print("### POD SECURITY POLICY ###")
+
+    if kind == "kind: NetworkPolicy":
+      print("### NETWORK POLICY ###")
 
 
  

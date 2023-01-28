@@ -149,7 +149,12 @@ class YamlParser:
 
           # Get PVC and PV name
           pvc_name = pvc_name + parsed_yaml["metadata"]["name"]
-          pv_name = pv_name + parsed_yaml["metadata"]["volumeName"]
+
+          if "volumeName:" in template:
+            pv_name = pv_name + parsed_yaml["metadata"]["volumeName"]
+
+          if "volumeName" not in template:
+            pv_name = pv_name + "Generic::" + parsed_yaml["spec"]["resources"]["requests"]["storage"]
       
           
           return pvc_name, pv_name
@@ -215,6 +220,41 @@ class YamlParser:
           print(exc)
 
       pass
+
+
+    def GetNetworkPolicyNameAndAssociations(template, path):
+      np_name = "NetworkPolicy::"
+      pod_label = "Pod::Label::"
+      pod_label_list = []
+
+      # Write on a test file
+      yaml_stub_path = YamlParser.CreateTemplateYamlFile(template,path)
+
+      # Open test file
+      with open(yaml_stub_path, 'r+') as stream:
+        try:
+          parsed_yaml=yaml.safe_load(stream)
+
+          # Get Network Policy name
+          print("### NETWORK POLICY NAME ###: " + parsed_yaml["metadata"]["name"])
+          np_name = np_name + parsed_yaml["metadata"]["name"]
+
+
+          for item in parsed_yaml["spec"]["podSelector"]["matchLabels"].items():
+            pod_label_list.append(pod_label + "" + item[0] + " " + item[1])
+
+          # Get Labels
+          # Labers are in form of "key": "value"
+          # So you have to iter both of them
+          # . item -> (key,value) for each item
+          for item in parsed_yaml["spec"]["selector"].items():
+            #print(item)
+            pod_label_list.append(pod_label + "" + item[0] + " " + item[1])
+          
+          return svc_name, pod_label_list
+
+        except yaml.YAMLError as exc:
+          print(exc)
         
 
 
