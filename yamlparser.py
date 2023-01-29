@@ -225,7 +225,11 @@ class YamlParser:
     def GetNetworkPolicyNameAndAssociations(template, path):
       np_name = "NetworkPolicy::"
       pod_label = "Pod::Label::"
+      ingress_name = "Ingress::"
+      egress_name = "Egress::"
       pod_label_list = []
+      ingress_list = []
+      egress_list = []
 
       # Write on a test file
       yaml_stub_path = YamlParser.CreateTemplateYamlFile(template,path)
@@ -236,22 +240,60 @@ class YamlParser:
           parsed_yaml=yaml.safe_load(stream)
 
           # Get Network Policy name
-          print("### NETWORK POLICY NAME ###: " + parsed_yaml["metadata"]["name"])
           np_name = np_name + parsed_yaml["metadata"]["name"]
-
-
-          for item in parsed_yaml["spec"]["podSelector"]["matchLabels"].items():
-            pod_label_list.append(pod_label + "" + item[0] + " " + item[1])
 
           # Get Labels
           # Labers are in form of "key": "value"
           # So you have to iter both of them
           # . item -> (key,value) for each item
-          for item in parsed_yaml["spec"]["selector"].items():
+          for item in parsed_yaml["spec"]["podSelector"]["matchLabels"].items():
             #print(item)
-            pod_label_list.append(pod_label + "" + item[0] + " " + item[1])
+            pod_label_list.append(pod_label + "" + item[0] + ": " + item[1])
+
+          # Get Ingress rules first
+          if "  ingress:" in template:
+            from_list = parsed_yaml["spec"]["ingress"]
+            for element in from_list:
+              for from_element in element["from"]:
+
+                # Handle CIDR and exceptions
+                if "ipBlock" in from_element:
+                  if "cird" in from_element["ipBlock"]:
+                    ingress_list.append(ingress_name + "cidr::" + from_element["ipBlock"]["cidr"])
+
+                  if "except" in from_element["ipBlock"]:
+                    #print(from_element["ipBlock"]["except"])
+                    for exception in from_element["ipBlock"]["except"]:
+                      ingress_list.append(ingress_name + "except::" + exception)
+
+                  
+                # Handle
+                if "namespaceSelector" in from_element:
+                  namespaces_labels = from_element["namespaceSelector"]["matchLabels"].items()
+                  for label in namespaces_labels:
+                    ingress_list.append(ingress_name + "namespaceSelector::" + label[0] + ": " + label[1])
+
+                if "podSelector" in from_element:
+                  pod_labels = from_element["podSelector"]["matchLabels"].items()
+                  for label in pod_labels:
+                    ingress_list.append(ingress_name + "podSelector::" + label[0] + ": " + label[1])
+
+
+               
+              #print("### INGRESS POLICY FOUND ###")
+
+
+
+          # if "  egress:" in template:
+          #   to_list = parsed_yaml["spec"]["egress"]
+          #   for element in to_list:
+          #     for to_element in element["to"]:
+          #       print(to_element)
+          #     print("### EGRESS POLICY FOUND ###")
+
           
-          return svc_name, pod_label_list
+          print(ingress_list)
+          return np_name, pod_label_list, ingress_list, egress_list
 
         except yaml.YAMLError as exc:
           print(exc)

@@ -109,7 +109,12 @@ if __name__ == "__main__":
       print("### POD SECURITY POLICY ###")
 
     if kind == "kind: NetworkPolicy":
+      np_name, pod_label_list, ingress_list, egress_list = YamlParser.GetNetworkPolicyNameAndAssociations(template, path)
       print("### NETWORK POLICY ###")
+      graph_handler.add_edge(namespace, np_name)
+      
+      for pod_label in pod_label_list:
+        print(pod_label)
 
 
  
