@@ -55,13 +55,6 @@ class Helm:
           file_template = lines[index+1:lines.index(lines[-1])]
           file_list.append(file_template)
 
-
-
-
-
-
-
-
       return file_list
 
 
