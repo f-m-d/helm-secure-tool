@@ -111,7 +111,18 @@ if __name__ == "__main__":
     if kind == "kind: NetworkPolicy":
       np_name, pod_label_list, ingress_list, egress_list = YamlParser.GetNetworkPolicyNameAndAssociations(template, path)
       print("### NETWORK POLICY ###")
-      graph_handler.add_edge(namespace, np_name)
+      graph_handler.add_edge(namespace, np_name,1)
+      graph_handler.add_edge(np_name,1 )
+
+      for pod_label in pod_label_list:
+
+        graph_handler.add_edge(np_name, pod_label,1)
+
+        for ingress_rule in ingress_list:
+          graph_handler.add_edge(pod_label, ingress_rule,1)   
+
+        for egress_rule in egress_list:
+          graph_handler.add_edge(pod_label, egress_rule,1)
       
       for pod_label in pod_label_list:
         print(pod_label)

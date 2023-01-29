@@ -279,7 +279,32 @@ class YamlParser:
                     ingress_list.append(ingress_name + "podSelector::" + label[0] + ": " + label[1])
 
 
-               
+          if "  egress:" in template:
+            from_list = parsed_yaml["spec"]["egress"]
+            for element in from_list:
+              for from_element in element["to"]:
+
+                # Handle CIDR and exceptions
+                if "ipBlock" in from_element:
+                  if "cidr" in from_element["ipBlock"]:
+                    egress_list.append(egress_name + "cidr::" + from_element["ipBlock"]["cidr"])
+
+                  if "except" in from_element["ipBlock"]:
+                    #print(from_element["ipBlock"]["except"])
+                    for exception in from_element["ipBlock"]["except"]:
+                      egress_list.append(egress_name + "except::" + exception)
+
+                  
+                # Handle
+                if "namespaceSelector" in from_element:
+                  namespaces_labels = from_element["namespaceSelector"]["matchLabels"].items()
+                  for label in namespaces_labels:
+                    egress_list.append(egress_name + "namespaceSelector::" + label[0] + ": " + label[1])
+
+                if "podSelector" in from_element:
+                  pod_labels = from_element["podSelector"]["matchLabels"].items()
+                  for label in pod_labels:
+                    egress_list.append(egress_name + "podSelector::" + label[0] + ": " + label[1])     
               #print("### INGRESS POLICY FOUND ###")
 
 
@@ -293,6 +318,7 @@ class YamlParser:
 
           
           print(ingress_list)
+          print(egress_list)
           return np_name, pod_label_list, ingress_list, egress_list
 
         except yaml.YAMLError as exc:
