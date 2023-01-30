@@ -16,7 +16,7 @@ if __name__ == "__main__":
   # Test an "helm template [path] command" 
   helm_template_output_file = Helm.GetHelmTemplateCommandOutputFile(path)
 
-  # Open the file and starting from the bot, strip the various file
+  # Open the file and starting from the bot, strip the templates
   # "expanded from template" using the Helm GO parser
 
   # Print gile path
@@ -50,8 +50,12 @@ if __name__ == "__main__":
           #print(kind)
           break
 
+
+
     
-    #if "kind: Deployment" in template:
+    #######################
+    ##### DEPLOYMENT ######
+    #######################
     if kind == "kind: Deployment":
       deployment_name, containers, vm_list, containers_with_vm_list = YamlParser.GetDeploymentAndContainers(template, path)
       print("### DEPLOYMENT ###")
@@ -64,6 +68,11 @@ if __name__ == "__main__":
         graph_handler.add_edge(container, volume_mount,1)
       
     
+
+
+    #######################
+    ######### POD #########
+    #######################
     if kind == "kind: Pod":
       pod_name, containers = YamlParser.GetPodAndContainers(template, path)
       print("### POD ###")
@@ -72,6 +81,12 @@ if __name__ == "__main__":
         graph_handler.add_edge(namespace, container, 1)
         graph_handler.add_edge(pod_name, container, 1)
         
+
+
+
+    #######################
+    ###### SERVICE ########
+    #######################    
     if kind == "kind: Service":
       svc_name, pod_label_list = YamlParser.GetServiceAndPodLabels(template, path)
       print("### SERVICE ###")
@@ -80,12 +95,21 @@ if __name__ == "__main__":
         graph_handler.add_edge(svc_name, pod_label, 1)
 
 
+
+
+    ##########################
+    ### PERSISTENT VOLUME ####
+    ##########################
     if kind == "kind: PersistentVolume":
       pv_name = YamlParser.GetPersistentVolumeName(template, path)
       print("### PERSISTENT VOLUME ####")
       graph_handler.add_edge(namespace, pv_name, 1)
 
-    
+
+
+    ################################
+    ### PERSISTENT VOLUME CLAIM ####
+    ################################
     if kind == "kind: PersistentVolumeClaim":
       pvc_name, pv_name = YamlParser.GetPvcNameAndPvName(template,path)
       print("### PERSISTENT VOLUME CLAIM ###")
@@ -93,6 +117,12 @@ if __name__ == "__main__":
       graph_handler.add_edge(pvc_name, pv_name, 1)
 
 
+
+
+
+    #######################
+    #### ROLE BINDING #####
+    #######################
     if kind == "kind: RoleBinding":
       rb_name, role_name, users = YamlParser.GetRoleBindingNameRoleNameAndUsers(template,path)
       print("### ROLE BINDING, ROLE AND USERS ###")
@@ -101,7 +131,11 @@ if __name__ == "__main__":
         graph_handler.add_edge(role_name, user,1)
 
 
-    # if "kind: ClusterRoleBinding" in template:
+
+
+    #############################
+    ### CLUSTER ROLE BINDING ####
+    #############################
     if kind == "kind: ClusterRoleBinding":
       crb_name, crole_name, users = YamlParser.GetClusterRoleBindingNameClusterRoleNameAndUsers(template,path)
       print("### CLUSTER ROLE BINDING, CLUSTER ROLE AND USERS ###")
@@ -110,14 +144,17 @@ if __name__ == "__main__":
         graph_handler.add_edge(crole_name, user,1)
 
 
+
+
     ############################
     ### POD SECURITY POLICY ####
     ############################
     if kind == "kind: PodSecurityPolicy":
       psp_name = YamlParser.GetPodSecurityPolicyName(template, path)
-      # IT IS A CLUSTER RESOURCE!!!
+      # IT IS A CLUSTER RESOURCE, so in theory it should not be added to namespace...
       print("### POD SECURITY POLICY ###")
       graph_handler.add_edge(namespace, psp_name, 1)
+
 
 
 
@@ -129,9 +166,8 @@ if __name__ == "__main__":
       print("### NETWORK POLICY ###")
       graph_handler.add_edge(namespace, np_name,1)
       graph_handler.add_edge(np_name,1 )
-
+      
       for pod_label in pod_label_list:
-
         graph_handler.add_edge(np_name, pod_label,1)
 
         for ingress_rule in ingress_list:
@@ -145,7 +181,7 @@ if __name__ == "__main__":
 
 
  
-  # Print Edge
+  # Print the Graph status
   print("#########################################")
   print("############# GRAPH STATUS ##############")
   print("#########################################")
