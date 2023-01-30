@@ -27,7 +27,10 @@ class YamlParser:
     def GetDeploymentAndContainers(template, path):
       deployment_name = "Deployment::"
       container_name = "Container::"
+      volume_mount_name = "VolumeMount::"
       container_list = []
+      volume_mounts = []
+      containers_with_volume_mounts = []
 
       # Write on a test file
       yaml_stub_path = YamlParser.CreateTemplateYamlFile(template,path)
@@ -43,9 +46,17 @@ class YamlParser:
 
           # Get container names
           for element in parsed_yaml["spec"]["template"]["spec"]["containers"]:
+            
+            # Add the volume mount and container with volume mount
+            if "volumeMounts" in element:
+              for vm in element["volumeMounts"]:
+                vm_stub = volume_mount_name + vm["name"] + "::Path::" + vm["mountPath"]
+                volume_mounts.append(vm_stub)
+                containers_with_volume_mounts.append(container_name + "" + element["name"])
+
             container_list.append(container_name + "" + element["name"])
           
-          return deployment_name, container_list
+          return deployment_name, container_list, volume_mounts, containers_with_volume_mounts
 
         except yaml.YAMLError as exc:
           print(exc)
@@ -163,8 +174,9 @@ class YamlParser:
           print(exc)
 
 
-    # 1) Resoure RoleBinding to namespace
-    # 2) Add_To_Graph(Role, User::Name,1)
+
+
+
     def GetRoleBindingNameRoleNameAndUsers(template, path):
       rb_name = "RoleBinding::"
       role_name = "Role::"
@@ -194,6 +206,7 @@ class YamlParser:
 
 
 
+
     def GetClusterRoleBindingNameClusterRoleNameAndUsers(template, path):
       rb_name = "ClusterRoleBinding::"
       role_name = "ClusterRole::"
@@ -220,6 +233,8 @@ class YamlParser:
           print(exc)
 
       pass
+
+
 
 
     def GetNetworkPolicyNameAndAssociations(template, path):
@@ -306,16 +321,6 @@ class YamlParser:
                   for label in pod_labels:
                     egress_list.append(egress_name + "podSelector::" + label[0] + ": " + label[1])     
               #print("### INGRESS POLICY FOUND ###")
-
-
-
-          # if "  egress:" in template:
-          #   to_list = parsed_yaml["spec"]["egress"]
-          #   for element in to_list:
-          #     for to_element in element["to"]:
-          #       print(to_element)
-          #     print("### EGRESS POLICY FOUND ###")
-
           
           print(ingress_list)
           print(egress_list)
@@ -324,6 +329,30 @@ class YamlParser:
         except yaml.YAMLError as exc:
           print(exc)
         
+
+
+
+    def GetPodSecurityPolicyName(template, path):
+      psp_name = "PodSecurityPolicy::"
+
+
+      # Write on a test file
+      yaml_stub_path = YamlParser.CreateTemplateYamlFile(template,path)
+
+      # Open test file
+      with open(yaml_stub_path, 'r+') as stream:
+        try:
+          parsed_yaml=yaml.safe_load(stream)
+
+          # Get PodSecurityPolicy
+          psp_name = psp_name + parsed_yaml["metadata"]["name"]
+      
+          return psp_name
+
+        except yaml.YAMLError as exc:
+          print(exc)
+
+      pass
 
 
 

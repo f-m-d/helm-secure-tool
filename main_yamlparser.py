@@ -52,12 +52,15 @@ if __name__ == "__main__":
     
     #if "kind: Deployment" in template:
     if kind == "kind: Deployment":
-      deployment_name, containers = YamlParser.GetDeploymentAndContainers(template, path)
+      deployment_name, containers, vm_list, containers_with_vm_list = YamlParser.GetDeploymentAndContainers(template, path)
       print("### DEPLOYMENT ###")
       graph_handler.add_edge(namespace, deployment_name, 1)
       for container in containers:
         graph_handler.add_edge(namespace, container, 1)
         graph_handler.add_edge(deployment_name, container, 1)
+
+      for container, volume_mount in zip(containers_with_vm_list, vm_list):
+        graph_handler.add_edge(container, volume_mount,1)
       
     
     if kind == "kind: Pod":
@@ -105,9 +108,21 @@ if __name__ == "__main__":
       for user in users:
         graph_handler.add_edge(crole_name, user,1)
 
-    if kind == "kind: PodSecurityPolicy":
-      print("### POD SECURITY POLICY ###")
 
+    ############################
+    ### POD SECURITY POLICY ####
+    ############################
+    if kind == "kind: PodSecurityPolicy":
+      psp_name = YamlParser.GetPodSecurityPolicyName(template, path)
+      # IT IS A CLUSTER RESOURCE!!!
+      print("### POD SECURITY POLICY ###")
+      graph_handler.add_edge(namespace, psp_name, 1)
+
+
+
+    #######################
+    ### NETWORK POLICY ####
+    #######################
     if kind == "kind: NetworkPolicy":
       np_name, pod_label_list, ingress_list, egress_list = YamlParser.GetNetworkPolicyNameAndAssociations(template, path)
       print("### NETWORK POLICY ###")
