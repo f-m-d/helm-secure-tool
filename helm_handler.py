@@ -16,6 +16,8 @@ class Helm:
 
       return (path + "\\"+ "demo-file.txt")
 
+
+
     
     # Path to the temporary file "demo-file.txt"
     # NB: start reading from the bottom
@@ -24,7 +26,6 @@ class Helm:
       f = open(path)
       lines = f.read().splitlines()
       f.close()
-
 
       # Base: Nothing to the first "---" found, starting from the latest line
       # General Case: from "---" to the next "---" is a kind

@@ -1,18 +1,19 @@
-from test import Helm
+from helm_handler import Helm
 from sys import argv
 from graph import Graph
-from helmhandler import HelmHandler
 from yamlparser import YamlParser
 import re
 
 if __name__ == "__main__":
 
+  # Initialize a Graph
   graph_handler = Graph(0)
 
+  # Indicate a namespace
   path = argv[1]
   namespace = "Namespace::"+argv[2]
 
-  # Test an "helm template [path]" 
+  # Test an "helm template [path] command" 
   helm_template_output_file = Helm.GetHelmTemplateCommandOutputFile(path)
 
   # Open the file and starting from the bot, strip the various file
