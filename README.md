@@ -4,11 +4,10 @@
 
 An implementation of [**Stay at the Helm: secure Kubernetes deployments via graph generation and attack reconstruction**](https://ieeexplore.ieee.org/document/9860863) paper in Python
 
-[TOCM]
 
-[TOC]
 
 # Introduction
+
 ## Application scope
 **Helm Secure Tool** is a tool to analyze the security of your Helm Charts and evaluate the security of you applications.
 
