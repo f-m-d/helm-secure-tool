@@ -1,7 +1,7 @@
 from helm_handler import Helm
 from sys import argv
 from graph import Graph
-from yamlparser import YamlParser
+from yaml_parser import YamlParser
 import re
 
 if __name__ == "__main__":

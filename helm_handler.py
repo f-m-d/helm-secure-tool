@@ -27,7 +27,8 @@ class Helm:
       lines = f.read().splitlines()
       f.close()
 
-      # Base: Nothing to the first "---" found, starting from the latest line
+      # Base: Nothing to the first "---" found,
+      # starting from the latest line
       # General Case: from "---" to the next "---" is a kind
       # Last case: from "---" to first line
 
@@ -38,7 +39,7 @@ class Helm:
 
     # Index of the last element in a list: a.index(a[-1])
 
-      # Base case
+      
       for index, line in reversed(list(enumerate(lines))):
 
         # General case
@@ -48,7 +49,7 @@ class Helm:
           file_list.append(file_template)
           latest_three_signs = index
 
-
+        # Base case
         if line == "---" and base_case == True:
           #print(index, line)
           base_case = False
