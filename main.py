@@ -6,8 +6,22 @@ import re
 
 if __name__ == "__main__":
 
+  pod_count = 0
+  deployment_count = 0
+  service_count = 0
+  pvc_count = 0
+  pv_count = 0
+  rb_count = 0
+  crb_count = 0
+  psp_count = 0
+  np_count = 0
+
+
+
   # Initialize a Graph
   graph_handler = Graph(0)
+
+  
 
   # Indicate a namespace
   path = argv[1]
@@ -57,6 +71,7 @@ if __name__ == "__main__":
     ##### DEPLOYMENT ######
     #######################
     if kind == "kind: Deployment":
+      deployment_count = deployment_count +1
       deployment_name, containers, vm_list, containers_with_vm_list = YamlParser.GetDeploymentAndContainers(template, path)
       print("### DEPLOYMENT ###")
       graph_handler.add_edge(namespace, deployment_name, 1)
@@ -88,6 +103,7 @@ if __name__ == "__main__":
     ###### SERVICE ########
     #######################    
     if kind == "kind: Service":
+      service_count = service_count + 1
       svc_name, pod_label_list = YamlParser.GetServiceAndPodLabels(template, path)
       print("### SERVICE ###")
       graph_handler.add_edge(namespace, svc_name,1)
@@ -101,6 +117,7 @@ if __name__ == "__main__":
     ### PERSISTENT VOLUME ####
     ##########################
     if kind == "kind: PersistentVolume":
+      pv_count = pv_count +1
       pv_name = YamlParser.GetPersistentVolumeName(template, path)
       print("### PERSISTENT VOLUME ####")
       graph_handler.add_edge(namespace, pv_name, 1)
@@ -111,6 +128,7 @@ if __name__ == "__main__":
     ### PERSISTENT VOLUME CLAIM ####
     ################################
     if kind == "kind: PersistentVolumeClaim":
+      pvc_count = pvc_count +1
       pvc_name, pv_name = YamlParser.GetPvcNameAndPvName(template,path)
       print("### PERSISTENT VOLUME CLAIM ###")
       graph_handler.add_edge(namespace, pvc_name,1)
@@ -124,6 +142,7 @@ if __name__ == "__main__":
     #### ROLE BINDING #####
     #######################
     if kind == "kind: RoleBinding":
+      rb_count = rb_count +1
       rb_name, role_name, users = YamlParser.GetRoleBindingNameRoleNameAndUsers(template,path)
       print("### ROLE BINDING, ROLE AND USERS ###")
       graph_handler.add_edge(namespace, rb_name,1)
@@ -137,6 +156,7 @@ if __name__ == "__main__":
     ### CLUSTER ROLE BINDING ####
     #############################
     if kind == "kind: ClusterRoleBinding":
+      crb_count = crb_count +1
       crb_name, crole_name, users = YamlParser.GetClusterRoleBindingNameClusterRoleNameAndUsers(template,path)
       print("### CLUSTER ROLE BINDING, CLUSTER ROLE AND USERS ###")
       graph_handler.add_edge(namespace, crb_name,1)
@@ -150,6 +170,7 @@ if __name__ == "__main__":
     ### POD SECURITY POLICY ####
     ############################
     if kind == "kind: PodSecurityPolicy":
+      psp_count = psp_count +1
       psp_name = YamlParser.GetPodSecurityPolicyName(template, path)
       # IT IS A CLUSTER RESOURCE, so in theory it should not be added to namespace...
       print("### POD SECURITY POLICY ###")
@@ -162,6 +183,7 @@ if __name__ == "__main__":
     ### NETWORK POLICY ####
     #######################
     if kind == "kind: NetworkPolicy":
+      np_count = np_count +1
       np_name, pod_label_list, ingress_list, egress_list = YamlParser.GetNetworkPolicyNameAndAssociations(template, path)
       print("### NETWORK POLICY ###")
       graph_handler.add_edge(namespace, np_name,1)
@@ -185,6 +207,19 @@ if __name__ == "__main__":
   print("#########################################")
   print("############# GRAPH STATUS ##############")
   print("#########################################")
-graph_handler.print_edge_list()
+  graph_handler.print_edge_list()
+
+  print("#########################################")
+  print("################ COUNT ##################")
+  print("#########################################")
+  print("kind: Pod: " + str(pod_count))
+  print("kind: Deployment: " + str(deployment_count))
+  print("kind: Service: " + str(service_count))
+  print("kind: PersistentVolumeClaim: " + str(pvc_count))
+  print("kind: RoleBinding: " + str(rb_count))
+  print("kind: ClusterRoleBinding: " + str(crb_count))
+  print("kind: PodSecurityPolicy: " + str(psp_count))
+  print("kind: NetworkPolicy: " + str(np_count))
+  print("kind: PersistentVolume: " + str(pv_count))
 
   

@@ -76,7 +76,7 @@ class YamlParser:
         try:
           parsed_yaml=yaml.safe_load(stream)
 
-          # Get Deployment name
+          # Get Pod name
           pod_name = pod_name + parsed_yaml["metadata"]["name"]
 
           # Get container names
