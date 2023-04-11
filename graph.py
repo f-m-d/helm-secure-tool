@@ -22,3 +22,5 @@ class Graph:
         num_of_edges = len(self.m_list_of_edges)
         for i in range(num_of_edges):
             print("edge ", i+1, ": ", self.m_list_of_edges[i])
+
+            
