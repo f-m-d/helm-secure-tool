@@ -12,6 +12,7 @@ class Helm:
       # Write output to a file
       f = open(path + "\\"+ "demo-file.txt", "w")
       f.write(output_to_write)
+      f.writelines("---")
       f.close
 
       return (path + "\\"+ "demo-file.txt")
